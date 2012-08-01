@@ -3,7 +3,7 @@
 // Make sure INDEX file is created with right permissions
 set_time_limit(0);
 
-define('EMAIL', 'EricPKerr@gmail.com');
+define('EMAIL', '"Eric Kerr" <EricPKerr@gmail.com>');
 define('USERNAME', 'erickerr');
 
 define('INDEX_FILE', 'favorite_tweets_index.txt');
@@ -52,7 +52,7 @@ function fetch_new_tweets(){
           'Reply-To: ' . EMAIL . "\r\n" .
           'X-Mailer: PHP/' . phpversion();
         
-        //mail(EMAIL, $subject, $message, $headers);
+        mail(EMAIL, $subject, $message, $headers);
       }
     }
     
