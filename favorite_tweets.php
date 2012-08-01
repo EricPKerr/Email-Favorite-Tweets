@@ -22,6 +22,7 @@ function fetch_new_tweets(){
   
   if(count($tweets) > 0){
     foreach($tweets as $tweet){
+      print_r($tweet); die();
       $tweet_id = (int)$tweet->id;
       if(array_search($tweet_id, $index) !== false){
         continue; // Already been indexed
@@ -33,22 +34,25 @@ function fetch_new_tweets(){
       if(count($urls) > 0){
         $text = $tweet->text;
         $who = $tweet->user->screen_name;
+        $name = $tweet->user->name;
+        $date = date('n/j/y g:i A', strtotime($tweet->created_at));
         
-        $subject = "Favorited @$who: " . $urls[0]->expanded_url;
+        $subject = "@$who, " . $date;
         
-        $message = '';
+        $message = '<b>' . $name . '(<a href="http://twitter.com/' . $who . '">@' . $who .'</a>)</b><br/>';
+        $message .= '<a href="http://twitter.com/' . $who . '/status/' . $tweet_id . '">' . $date . '</a><br/>';
+        $message .= $text . '</br><br/>';
+        
         foreach($urls as $url){
           $message .= '<a href="' . $url->expanded_url . '">' . $url->expanded_url . '</a><br/>';
         }
-        
-        $message .= '<br/><a href="http://twitter.com/' . $who . '/status/' . $tweet_id . '">@' . $who . '</a> - ' . $text;
         
         $headers = 'Content-type: text/html' . "\r\n" .
           'From: ' . EMAIL . "\r\n" .
           'Reply-To: ' . EMAIL . "\r\n" .
           'X-Mailer: PHP/' . phpversion();
         
-        mail(EMAIL, $subject, $message, $headers);
+        //mail(EMAIL, $subject, $message, $headers);
       }
     }
     
