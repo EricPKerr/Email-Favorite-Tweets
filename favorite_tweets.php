@@ -22,7 +22,6 @@ function fetch_new_tweets(){
   
   if(count($tweets) > 0){
     foreach($tweets as $tweet){
-      print_r($tweet); die();
       $tweet_id = (int)$tweet->id;
       if(array_search($tweet_id, $index) !== false){
         continue; // Already been indexed
