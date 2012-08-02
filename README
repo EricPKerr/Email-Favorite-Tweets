@@ -1,0 +1,3 @@
+Run PHP script as 1 minute cron job
+Make sure favorite_tweets_index.txt file is read/writeable
+30 second limit due to unauthenticated API rate-limit

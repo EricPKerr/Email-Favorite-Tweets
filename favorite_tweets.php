@@ -2,6 +2,7 @@
 // Run as cron job every 1 minute
 // Make sure INDEX file is created with right permissions
 set_time_limit(0);
+date_default_timezone_set('America/New_York'); 
 
 define('EMAIL', '"Eric Kerr" <EricPKerr@gmail.com>');
 define('USERNAME', 'erickerr');
@@ -34,21 +35,24 @@ function fetch_new_tweets(){
         $text = $tweet->text;
         $who = $tweet->user->screen_name;
         $name = $tweet->user->name;
+        $thumb = $tweet->user->profile_image_url;
         $date = date('n/j/y g:i A', strtotime($tweet->created_at));
         
         $subject = "@$who, " . $date;
         
-        $message = '<b>' . $name . '(<a href="http://twitter.com/' . $who . '">@' . $who .'</a>)</b><br/>';
+        $message = '<table><tr><td><img src="' . $thumb . '" style="margin:8px;width:48px;"></td><td><b>' . $name . ' (<a href="http://twitter.com/' . $who . '">@' . $who .'</a>)</b><br/>';
         $message .= '<a href="http://twitter.com/' . $who . '/status/' . $tweet_id . '">' . $date . '</a><br/>';
-        $message .= $text . '</br><br/>';
+        $message .= $text . '</td></tr></table><br/>';
         
         foreach($urls as $url){
           $message .= '<a href="' . $url->expanded_url . '">' . $url->expanded_url . '</a><br/>';
         }
         
+        $message .= '<br/><br/>Sent from Favorited Tweet';
+        
         $headers = 'Content-type: text/html' . "\r\n" .
-          'From: ' . EMAIL . "\r\n" .
-          'Reply-To: ' . EMAIL . "\r\n" .
+          'From: noreply@erickerr.com' . "\r\n" .
+          'Reply-To: noreply@erickerr.com' . "\r\n" .
           'X-Mailer: PHP/' . phpversion();
         
         mail(EMAIL, $subject, $message, $headers);
