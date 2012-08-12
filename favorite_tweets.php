@@ -10,8 +10,8 @@ define('USERNAME', 'erickerr');
 define('INDEX_FILE', 'favorite_tweets_index.txt');
 define('INDEX_SIZE', 100); // Store most recent tweet ids to account for tweets out of order
 
-define('FAVORITES_URL', 'http://api.twitter.com/1/favorites.json?screen_name=' . USERNAME . '&count=20&include_entities=true');
-define('TIMELINE_URL', 'http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' . USERNAME . '&include_entities=true');
+define('FAVORITES_URL', 'http://api.twitter.com/1/favorites.json?screen_name=' . USERNAME . '&count=30&include_entities=true');
+define('TIMELINE_URL', 'http://api.twitter.com/1/statuses/user_timeline.json?screen_name=' . USERNAME . '&count=30include_entities=true');
 
 function fetch_new_tweets(){
   $fh = fopen(INDEX_FILE, 'r+');
@@ -45,14 +45,15 @@ function fetch_new_tweets(){
         $message .= $text . '</td></tr></table><br/>';
         
         foreach($urls as $url){
-          $message .= '<a href="' . $url->expanded_url . '">' . $url->expanded_url . '</a><br/>';
+          $real_url = real_url($url->expanded_url);
+          $message .= '<a href="' . $real_url . '">' . $real_url . '</a><br/>';
         }
         
         $message .= '<br/><br/>Sent from Favorited Tweet';
         
         $headers = 'Content-type: text/html' . "\r\n" .
-          'From: noreply@erickerr.com' . "\r\n" .
-          'Reply-To: noreply@erickerr.com' . "\r\n" .
+          'From: eric@erickerr.com' . "\r\n" .
+          'Reply-To: eric@erickerr.com' . "\r\n" .
           'X-Mailer: PHP/' . phpversion();
         
         mail(EMAIL, $subject, $message, $headers);
@@ -70,6 +71,24 @@ function fetch_new_tweets(){
   fseek($fh, 0);
   fwrite($fh, $index, strlen($index));
   fclose($fh);
+}
+
+function real_url($url){
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_HEADER, true);
+  curl_setopt($ch, CURLOPT_NOBODY, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+  $response = curl_exec($ch);
+  curl_close($ch);
+  
+  $response = explode('Location: ', $response);
+  if(count($response) > 1){
+    $response = explode("\n", $response[count($response) - 1]);
+    $url = trim($response[0]);
+  }
+  
+  return $url;
 }
 
 fetch_new_tweets();
